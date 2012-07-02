@@ -1,0 +1,29 @@
+<html>
+<head>
+	<script type="text/javascript">
+	function preventDef(event) {
+		event.preventDefault();
+	}
+
+	function addHandler() {
+		document.getElementById("checkbox").addEventListener("click", preventDef, false);
+	}
+
+	function removeHandler() {
+		document.getElementById("checkbox").removeEventListener("click", preventDef, false);
+	}
+
+	function simulateClick() {
+		var evt, cb;
+		evt = document.createEvent("MouseEvents");
+		evt.initMouseEvent("click", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+		cb = document.getElementById("checkbox");
+		cb.dispatchEvent(evt);
+	}
+	</script>
+</head>
+<body>
+	<input type="checkbox" id="checkbox"/><label for="checkbox">Checkbox</label>
+	<input type="button" onclick="simulateClick();" value="Simulate click"/>
+</body>
+</html>

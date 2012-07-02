@@ -1,0 +1,21 @@
+<html>
+<head>
+  <title>Dusting the Web - window.postMessage origin security test</title>
+  <script type="text/javascript">
+    function test1() {
+      var e = document.getElementById("test1");
+      e.contentWindow.postMessage("Hello Test 1", "*");
+    }
+    function test2() {
+      var e = document.getElementById("test2");
+      e.contentWindow.postMessage("Hello Test 2", "*");
+    }
+  </script>
+</head>
+<body>
+  <h3>Test1</h3>
+  <iframe id="test1" src="http://www.csua.berkeley.edu/~jlhawn/checking_frame.html"></iframe>
+  <h3>Test2</h3>
+  <iframe id="test2" src="http://www.csua.berkeley.edu/~jlhawn/non_checking_frame.html"></iframe>
+</body>
+</html>

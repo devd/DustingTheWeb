@@ -1,0 +1,74 @@
+<html>
+<body>
+<script>
+/*global chrome */
+/*jslint devel: true, browser: true, nomen: true */
+// Code for the server is at https://github.com/rzhao/dustingtheweb_db
+function postToServer(msgURL, msgType, msgMessage) {
+	"use strict";
+	if (window.sessionStorage) {
+		if (window.sessionStorage[msgURL + "-" + msgType] === undefined) {
+			var logReq, serverURL, jsonObject;
+			console.error(msgURL + "\n[" + msgType + "]: " + encodeURIComponent(msgMessage));
+			logReq = new XMLHttpRequest();
+			serverURL = "https://yourapp.herokuapp.com/messages";
+			jsonObject = {message: {url: msgURL, vulnerability_id: msgType, text: msgMessage, crawler: false}};
+			logReq.open("POST", serverURL, true);
+			logReq.setRequestHeader("Content-type", "application/json");
+			logReq.onreadystatechange = function () {
+				if (logReq.status >= 200 && logReq.status < 300) {
+					console.log("Sent!");
+					window.sessionStorage[msgURL + "-" + msgType] = 1;
+				}
+			};
+            //Send request to a file logger extension (separate). This extension just saves all messages for latter parsing
+			//chrome.extension.sendRequest('aafmhjefpcdalkkdhliijedkjdnmpgpm', msgURL + " - " + msgType + " - " + msgMessage);
+			logReq.send(JSON.stringify(jsonObject));
+		} else {
+			console.log("Received vulnerability which was already logged, discarding");
+		}
+	}
+}
+(function () {
+	"use strict";
+	chrome.extension.onRequest.addListener(
+		function (request, sender, sendResponse) {
+			postToServer(request.url, request.type, request.message);
+			sendResponse({});
+		}
+	);
+	chrome.extension.onConnect.addListener(function (port) {
+		port.onMessage.addListener(function (msg) {
+			postToServer(msg.URL, msg.type, msg.message);
+		});
+	});
+	chrome.webRequest.onHeadersReceived.addListener(function (details) {
+		var i, j, cookieHeader, isHttps, isSecure;
+		if (details.url === "https://yourapp.herokuapp.com/messages") {
+			return;
+		}
+		isHttps = details.url.split(":")[0] === "https";
+		for (i = 0; i < details.responseHeaders.length; i += 1) {
+			if (details.responseHeaders[i].name === "Set-Cookie") {
+				postToServer(details.url, "Cookies", "Website Set a cookie");
+				cookieHeader = details.responseHeaders[i].value.split(";");
+				isSecure = false;
+				for (j = 0; j < cookieHeader.length; j += 1) {
+					if (cookieHeader[j].toLowerCase().indexOf("secure") !== -1) {
+						isSecure = true;
+						if (!isHttps) {
+							postToServer(details.url, "Cookies", "Non-secure website set a secure cookie!");
+						}
+						break;
+					}
+				}
+				if (!isSecure && isHttps) {
+					postToServer(details.url, "Cookies", "Secure website set a non-secure cookie!");
+				}
+			}
+		}
+	}, { urls: ["<all_urls>"] }, ["responseHeaders"]);
+}());
+</script>
+</body>
+</html>

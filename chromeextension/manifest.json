@@ -1,0 +1,26 @@
+{
+  "name": "Web Duster",
+  "version": "1.0",
+  "description": "CS161 - dustingtheweb.",
+  "background_page": "background.html",
+  "browser_action": {
+    "default_icon": "dustingtheweb.png"
+  },
+  "permissions": [
+	"tabs", "http://*/", "https://*/", "webRequest","*://*.google.com", "webRequestBlocking", "file://*/"
+  ],
+  "content_scripts": [
+    {
+        "matches": ["\u003Call_urls\u003E"],
+        "run_at": "document_start",
+        "js": ["logging.js"],
+        "all_frames": true
+    },
+    {
+        "matches": ["\u003Call_urls\u003E"],
+        "run_at": "document_end",
+        "js": ["after.js"],
+        "all_frames": true
+    }
+  ]
+}

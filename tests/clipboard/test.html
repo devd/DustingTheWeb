@@ -1,0 +1,51 @@
+<html>
+<head>
+	<script>
+	var bResult;
+	// Select the text to be cut. Trailing spaces in a text
+	// selection in cut events cause the Cut shortcut menu item to
+	// remain disabled.
+	function fnLoad() {
+	    var r = document.body.createTextRange();
+	    r.findText(oSource.innerText);
+	    r.select();
+	}
+	// Enable the Cut shortcut menu item over the DIV. Cut is disabled by default.
+	// Once Cut is enabled, Internet Explorer automatically copies the data to the
+	// clipboard and removes the selected text from the document.
+	function fnBeforeCut() {
+	    event.returnValue = false;
+	}
+	// Assign data in text format to the window.clipboardData object.
+	// Display the result (Boolean) from the setData method in the input box below.
+	function fnCut() {
+		event.returnValue = false;
+		bResult = window.clipboardData.setData("Text", oSource.innerText);
+		oSource.innerText = "";
+		tText.innerText += bResult;
+	}
+	// Enable the Paste shortcut menu item over the DIV. Paste is disabled by default.
+	function fnBeforePaste() {
+	    event.returnValue = false;
+	}
+	// Cancel the returnValue in onpaste for the text input, which
+	// has a default behavior.
+	function fnPaste() {
+	    event.returnValue = false;
+		oTarget.innerText = window.clipboardData.getData("Text");
+	}
+	</script>
+</head>
+<body onload="fnLoad();" topmarging=0 leftmarging=0 bgproperties="fixed" bgcolor="#ffffff" link="#000000" vlink="#808080" alink="#000000">
+	<form>
+		<div class="clsSource" id="oSource" onbeforecut="fnBeforeCut();" oncut="fnCut();">
+			<input type="text" value="Select and cut this text"/>
+		</div>
+	</form>
+	<div class="clsTarget" id="oTarget" onbeforepaste="fnBeforePaste();" onpaste="fnPaste();">
+		<input type="text" value="Paste the Text Here"/>
+	</div>
+	<span class="clsData">setData Result: </span>
+	<input class="clsText" id="tText" type="text" readonly value="">
+</body>
+</html>
