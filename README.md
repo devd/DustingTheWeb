@@ -8,7 +8,7 @@ The whole code is designed to pass jslint.
 
 The architecture is to run content scripts before and after the page loads to MITM bad behavior and log it 
 by sending it to background.html. The background page can either send it to a DB (code for which is separately
-available at https://github.com/rzhao/dustingtheweb_db or to another logging extension. 
+available at https://github.com/rzhao/dustingtheweb_db or to another logging extensio (https://github.com/devd/chrome-filelogger) 
 
 Based on the logs, we generated stats for two runs:
 
